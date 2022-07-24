@@ -1,0 +1,8 @@
+[package]
+name = "rustmal"
+version = "0.0.1"
+authors = ["namespace-miata"]
+
+[[bin]]
+name = "step0_repl"
+path = "step0_repl.rs"

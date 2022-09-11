@@ -1,4 +1,4 @@
-def pr_str(ast)
+def pr_str(ast, print_readably)
   prnt_str = ""
   case ast
   when Array
@@ -21,7 +21,16 @@ def pr_str(ast)
   when FalseClass
     return "false"
   when String
-    return ast
+    if print_readably
+      return escape(ast)
+    else 
+      return ast
+    end
   end
 
+end
+
+def escape(str)
+  minus_quotes = str[1..-2]
+  return "\"" + minus_quotes.gsub(/\\/, "\\\\").gsub(/\n/, "\\n").gsub(/\"/, "\\\"") + "\""
 end

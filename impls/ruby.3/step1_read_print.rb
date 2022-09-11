@@ -12,7 +12,7 @@ def eval(input)
 end
 
 def print(input)
-  return pr_str(input)
+  return pr_str(input, true)
 end
 
 def rep(input)

@@ -45,7 +45,7 @@ end
 def tokenize(input)
   token_regex = Regexp.new(/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/)
   tokens = input.scan(token_regex).flatten
-  puts tokens[0..-2].to_s
+  # puts tokens[0..-2].to_s
   unless tokens.count("(") != tokens.count(")")
     return tokens[0..-2]
   else
@@ -90,7 +90,7 @@ def read_atom(reader)
   when !Integer(reader.peek, exception: false).nil?
     return Integer(reader.next)
   when reader.peek.match?(/"(?:\\.|[^\\"])*"?/)
-    return reader.next
+    return unescape(reader.next)
   when reader.peek == "nil"
     return nil
   when reader.peek == "true"
@@ -103,5 +103,5 @@ def read_atom(reader)
 end
 
 def unescape(str)
-  return str.gsub("\\\\", "\\")
+  return str.gsub("\\n", "\n").gsub("\\\\", "\\").gsub("\\\"", "\"")
 end

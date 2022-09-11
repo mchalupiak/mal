@@ -1,7 +1,10 @@
 require "readline"
+require "./reader.rb"
+require "./printer.rb"
+
 
 def read(input)
-  return input
+  return read_str(input)
 end
 
 def eval(input)
@@ -9,11 +12,16 @@ def eval(input)
 end
 
 def print(input)
-  return input
+  return pr_str(input)
 end
 
 def rep(input)
-  print(eval(read(input)))
+  begin
+    result = print(eval(read(input)))
+  rescue EOFError => error
+    result = error
+  end
+  return result
 end
 
 def main()

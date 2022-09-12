@@ -1,8 +1,9 @@
+
 class Reader
 
   def initialize(tokens)
     @position = 0
-    @tokens = tokens
+    @tokens = tokens.nil? ? Array.new : tokens
   end
 
   def next
@@ -43,13 +44,24 @@ def read_str(input)
 end
 
 def tokenize(input)
+  if input.nil?
+    return nil
+  end
   token_regex = Regexp.new(/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/)
   tokens = input.scan(token_regex).flatten
   # puts tokens[0..-2].to_s
-  unless tokens.count("(") != tokens.count(")")
-    return tokens[0..-2]
+  if tokens.count("(") != tokens.count(")")
+    raise EOFError.new("EOF Error: Unmatched Paratheses")
+  elsif tokens.count("[") != tokens.count("]")
+    raise EOFError.new("EOF Error: Unmatched Brackets")
+  elsif tokens.count("{") != tokens.count("}")
+    raise EOFError.new("EOF Error: Unmatched Braces")
+  elsif tokens.join("").count("\"") % 2 != 0
+    raise EOFError.new("EOF Error: Unmatched Double Quote")
+  elsif tokens[0].match?(/;+/)
+    return nil
   else
-    raise EOFError.new("EOF Error")
+    return tokens[0..-2]
   end
 end
 
@@ -67,6 +79,10 @@ def read_form(reader)
     #return form
     # reader.next
     return read_list(reader)
+  when "["
+    return read_vector(reader)
+  when "{"
+    return read_hashmap(reader)
   else
     return read_atom(reader)
   end
@@ -85,8 +101,44 @@ def read_list(reader)
   return arr
 end
 
+def read_vector(reader)
+  reader.next
+  vec = Array.[]("\u{0020}")
+  while reader.peek != "]"
+    vec.push(read_form(reader))
+  end
+  reader.next
+  return vec
+end
+
+def read_hashmap(reader)
+  reader.next
+  hash = Hash.new("nil")
+  is_key = true
+  key = ""
+  entries = 0;
+  while reader.peek != "}"
+    if is_key
+      key = read_form(reader)
+      hash[key]
+      is_key = false
+    elsif !is_key
+      hash[key] = read_form(reader)
+      is_key = true
+    end
+    entries += 1
+  end
+  if entries % 2 != 0
+    raise EOFError.new("Unbalanced Hashmap: Make sure every key has a value")
+  end
+  reader.next
+  return hash
+end
+
 def read_atom(reader)
   case
+  when reader.peek.nil?
+    return nil
   when !Integer(reader.peek, exception: false).nil?
     return Integer(reader.next)
   when reader.peek.match?(/"(?:\\.|[^\\"])*"?/)
@@ -97,6 +149,8 @@ def read_atom(reader)
     return true
   when reader.peek == "false"
     return false 
+  when reader.peek.match?(/^:[A-z]*/)
+    return "\u{0020}" + reader.peek
   else
     return reader.next.to_sym
   end

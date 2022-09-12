@@ -8,7 +8,7 @@ def pr_str(ast, print_readably)
     vec ? (prnt_str << "[") : (prnt_str << "(")
     ast.each do | token |
       if token != "\u{0020}"
-        prnt_str << (pr_str(token, true)) + " "
+        prnt_str << (pr_str(token, true)).to_s + " "
       end
     end
     prnt_str = prnt_str.rstrip
@@ -40,6 +40,8 @@ def pr_str(ast, print_readably)
     else 
       return ast
     end
+  else
+    return ast.to_s
   end
 
 end

@@ -30,6 +30,13 @@ def eval(input, env)
     else
       return input
     end
+  when Hash
+    keys = input.keys
+    new_ast = Hash.new
+    keys.each do | key |
+      new_ast[key] = eval(input[key], env)
+    end
+    return new_ast
   else
     return eval_ast(input, env)
   end

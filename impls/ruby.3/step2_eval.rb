@@ -69,6 +69,8 @@ def rep(input)
     result = error
   rescue KeyError => error
     result = error
+  rescue ArgumentError => error
+    result = error
   end
   return result
 end

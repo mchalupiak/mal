@@ -7,7 +7,7 @@ def pr_str(ast, print_readably)
     ast[0] == "\u{0020}" ? (vec = true) : (vec = false)
     vec ? (prnt_str << "[") : (prnt_str << "(")
     ast.each do | token |
-      if token != nil && token != "\u{0020}"
+      if token != "\u{0020}"
         prnt_str << (pr_str(token, true)) + " "
       end
     end
@@ -36,6 +36,7 @@ def pr_str(ast, print_readably)
     if ast.match?(/^\u{0020}/)
       return ast[1..-1]
     elsif print_readably
+      p "here"
       return escape(ast)
     else 
       return ast
@@ -45,6 +46,7 @@ def pr_str(ast, print_readably)
 end
 
 def escape(str)
-  minus_quotes = str[1..-2]
-  return "\"" + minus_quotes.gsub(/\\/, "\\\\").gsub(/\n/, "\\n").gsub(/\"/, "\\\"") + "\""
+  # minus_quotes = str#[1..-2]
+  # p str.gsub(/\\/, "\\\\")
+  return "\"" + str.gsub("\\", "\\\\\\\\").gsub("\n",'\n').gsub('"','\"') + "\""
 end

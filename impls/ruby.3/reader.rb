@@ -56,8 +56,8 @@ def tokenize(input)
     raise EOFError.new("EOF Error: Unmatched Brackets")
   elsif tokens.count("{") != tokens.count("}")
     raise EOFError.new("EOF Error: Unmatched Braces")
-  elsif tokens.join("").count("\"") % 2 != 0
-    raise EOFError.new("EOF Error: Unmatched Double Quote")
+  # elsif tokens.join("").count("\"") % 2 != 0
+    # raise EOFError.new("EOF Error: Unmatched Double Quote")
   elsif tokens[0].match?(/;+/)
     return nil
   else
@@ -113,15 +113,15 @@ end
 
 def read_hashmap(reader)
   reader.next
-  hash = Hash.new("nil")
+  hash = Hash.new
   is_key = true
   key = ""
   entries = 0;
   while reader.peek != "}"
     if is_key
       key = read_form(reader)
+      key.class == String ? (is_key = false) : (raise KeyError.new("Key Error: HashMap Keys can only be strings or keywords"))
       hash[key]
-      is_key = false
     elsif !is_key
       hash[key] = read_form(reader)
       is_key = true
@@ -138,24 +138,31 @@ end
 def read_atom(reader)
   case
   when reader.peek.nil?
+    reader.next
     return nil
   when !Integer(reader.peek, exception: false).nil?
     return Integer(reader.next)
   when reader.peek.match?(/"(?:\\.|[^\\"])*"?/)
     return unescape(reader.next)
   when reader.peek == "nil"
+    reader.next
     return nil
   when reader.peek == "true"
+    reader.next
     return true
   when reader.peek == "false"
+    reader.next
     return false 
   when reader.peek.match?(/^:[A-z]*/)
-    return "\u{0020}" + reader.peek
+    return "\u{0020}" + reader.next
   else
     return reader.next.to_sym
   end
 end
 
 def unescape(str)
-  return str.gsub("\\n", "\n").gsub("\\\\", "\\").gsub("\\\"", "\"")
+  #p str[1..-2]
+  #returnval = str[1..-2].gsub("\\n", "\n").gsub("\\\\", "\\").gsub("\\\"", "\"")
+  #p returnval
+  return str[1..-2].gsub(/\\./, {"\\\\" => "\\", "\\n" => "\n", "\\\"" => '"'})
 end

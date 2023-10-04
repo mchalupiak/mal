@@ -8,7 +8,7 @@ def pr_str(ast, print_readably)
     vec ? (prnt_str << "[") : (prnt_str << "(")
     ast.each do | token |
       if token != "\u{0020}"
-        prnt_str << (pr_str(token, true)).to_s + " "
+        prnt_str << (pr_str(token, print_readably)).to_s + " "
       end
     end
     prnt_str = prnt_str.rstrip
@@ -17,7 +17,7 @@ def pr_str(ast, print_readably)
     keys = ast.keys
     prnt_str << "{"
     keys.each do | token |
-      prnt_str << (pr_str(token, true)) + " " + (pr_str(ast[token], true)) + " "
+      prnt_str << (pr_str(token, print_readably)) + " " + (pr_str(ast[token], print_readably)) + " "
     end
     prnt_str = prnt_str.rstrip
     prnt_str << "}"
